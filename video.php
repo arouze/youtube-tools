@@ -2,14 +2,20 @@
 
 /**
  * Class Youtube_Video
- * @property string $sId
- * @property string $sCmsId
  */
 class Youtube_Video
 {
   CONST YOUTUBE_PARAM_SUBTITLE = 'cc_load_policy';
 
   CONST YOUTUBE_PARAM_AUTOPLAY = 'autoplay';
+
+  CONST YOUTUBE_PARAM_START    = 'start';
+
+  CONST YOUTUBE_PARAM_THEME    = 'theme';
+
+  CONST THEME_DARK             = 'dark';
+
+  CONST THEME_LIGHT            = 'light';
 
   /**
    * @var array
@@ -36,7 +42,8 @@ class Youtube_Video
     return $this;
   }
 
-  protected $_sId = null;
+  /** @var string */
+  protected $_sId;
 
   /**
    * @param string $sId
@@ -45,6 +52,19 @@ class Youtube_Video
   public function SetId($sId)
   {
     $this->_sId = $sId;
+    return $this;
+  }
+
+  /**
+   * @param $iSeconds
+   *
+   * @return $this
+   */
+
+  public function Start($iSeconds)
+  {
+    if (is_int($iSeconds))
+      $this->_aParams[self::YOUTUBE_PARAM_START] = $iSeconds;
     return $this;
   }
 
@@ -65,7 +85,7 @@ class Youtube_Video
   * @param int $iWidth
   * @return  $this
   */
-  public function Set_iWidth($iWidth)
+  public function Width($iWidth)
   {
     $this->_iWidth = $iWidth;
     return $this;
@@ -80,12 +100,25 @@ class Youtube_Video
    * @param int $iHeight
    * @return  $this
    */
-  public function Set_iHeight($iHeight)
+  public function Height($iHeight)
   {
     $this->_iHeight = $iHeight;
     return $this;
   }
 
+  /**
+   * @param $sTheme
+   *
+   * @return $this
+   */
+
+  public function Theme($sTheme)
+  {
+    if (in_array($sTheme, array(self::THEME_DARK, self::THEME_LIGHT)))
+      $this->_aParams[self::YOUTUBE_PARAM_THEME] = $sTheme;
+
+    return $this;
+  }
 
   /**
    * @param string $sYoutubeUrl
@@ -138,8 +171,16 @@ class Youtube_Video
     return $sPath;
   }
 
+  /**
+   * @return string
+   * @throws Exception
+   */
   public function Display()
   {
+
+    if (!$this->_sId)
+      throw new Exception('Video Id not defined');
+
     $sUrl = '//www.youtube.com/embed/' . $this->_sId;
 
     if (sizeof($this->_aParams) > 0)
